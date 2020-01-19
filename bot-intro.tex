@@ -1,0 +1,437 @@
+\section{Introduction}
+\label{sec:intro}
+Several research communities nurture work on adversarial attacks
+on algorithms. The motivation is to push the sate-of-the-art by
+identifying model and algorithmic weaknesses. The ``attacked''
+algorithms are often used in real-life systems (e.g., face
+recognition \cite{Dong+al:19a}). Exposing their vulnerabilities is considered an accelerator for innovation more than
+a threat.
+
+A classic example is the crypto community. Throughout the decades,
+publications of successful attacks on crypto mechanisms helped to push
+forward improved mechanisms \cite{Boneh:99a}. Additional examples are the
+machine learning, natural language
+processing and vision communities. There has recently
+been much work on devising adversarial attacks on machine learning
+algorithms --- specifically neural networks --- that span different
+tasks: general machine learning challenges
+\cite{Szegedy+al:14a,Huang+al:17a,Papernot+al:17a}, reading
+comprehension \cite{Jia+Liang:17a}, speaker identification
+\cite{Kreuk+al:18a}, object detection \cite{Xie+al:17a}, face
+recognition \cite{Dong+al:19a}, and more. This line of work has
+driven forward the development of algorithms which are more robust to
+adversarial examples; e.g., Jia et al. \cite{Jia+al:19a}, He et al. \cite{He+al:17a}, Zhang et
+al. \cite{Zhang+al:19a}.
+
+The Web search echo system is, perhaps, the largest-scale adversarial
+setting in which algorithms, specifically search methods,
+operate. That is, many document authors consistently modify their
+documents to have them more highly ranked for specific queries.  This
+practice is often referred to as search engine optimization (SEO)
+\cite{Gyongyi+Molina:05a}.  The incentive is quite clear: high ranks
+translate to high utility as most of the attention --- and therefore
+engagement --- of search engine users is focused on the documents most
+highly ranked \cite{Joachims+al:05a}. Some SEO techniques are
+considered ``illegitimate'' (a.k.a., black-hat
+\cite{Gyongyi+Molina:05a}) as they are unethical and hurt the echo system (e.g., search effectiveness and/or user experience); spamming is a prominent
+example. Other techniques are considered completely ``legitimate''
+(a.k.a., white-hat \cite{Gyongyi+Molina:05a}) as they are intended to
+improve documents' representations with respect to queries to which
+they pertain. Thus, in the ``ranking games'' that take place on the
+Web \cite{Tennenholtz+Kurland:19a}, the documents' authors are
+``players'' or ``adversaries'' whose adversarial actions can be
+``legitimate'' (white hat) or ``illegitimate'' (black hat); the
+search engine's ranking function is the mediator.
+
+Despite its importance as a large scale and highly evolved adversarial
+setting, and despite the research attention paid to adversarial
+attacks and defenses in other research communities as mentioned above,
+the adversarial effects in the Web search echo system have attracted
+relatively little research attention.
+%Most work has been confined to
+%identifying spam (content, anchor text and hyperlink based)
+%\cite{AIRWeb,Castillo+Davison:10a} which is one out of many possible
+%black-hat SEO techniques.
+An important reason for this reality is that developing black-hat SEO
+techniques is unethical, and can hurt the search echo system in the
+short term. Yet, it can also potentially help to find vulnerabilities
+of search functions which is important for improving them in the long
+run. We subscribe to the stand that, despite the potential long term
+merits, such type of work should see no place in
+scientific publications. Thus, the question becomes why there is not a
+much larger body of work on addressing
+potential adversarial effects. In fact, the vast majority of such work
+has been on spam identification
+\cite{AIRWeb,Castillo+Davison:10a}. One part of the answer seems to be
+that many of the adversarial effects are due to, or involve, the dynamic nature of the Web --- changes of pages,
+ranking function, indexing cycles, etc. A case in point, the mere fact that some authors
+are incentivized to compete for improved ranking yields, in 
+white hat settings, negative
+impact on the search echo system; specifically, degrading topic
+diversity in the corpus \cite{Basat+al:17a,Raifer+al:17a}.
+Studying such dynamics in terms of rankings seems to require query
+logs of large-scale commercial Web search engines. In other words, it
+is very difficult to impossible to replicate the dynamic search
+setting on the Web. In contrast, for example, devising and evaluating content-based
+spam classifiers can be done using a static snapshot of documents and
+regardless of rankings.
+
+We claim that the state-of-affairs just described, in terms of the
+limited volume and scope of work on adversarial Web search, is
+nowadays being challenged to a major extent and there is a call to
+action. In the last few years there has been a dramatic change in
+terms of the potential ability to generate large scale and high
+quality black hat content effects. For example, advanced language modeling
+techniques such as BERT \cite{Delvin+al:18a}, GPT2
+\cite{Radford+al:18a} and XLNet \cite{Yang+al:19a} can be used to
+automatically generate fake content at scale
+\cite{Zellers+al:19a}. While fake content could be considered spam, it
+is way more difficult to identify than classic spam, especially when
+generated using the above mentioned state-of-the-art techniques
+\cite{Zellers+al:19a}; as a case in point, fake content could still be of high
+quality.  Another example for a
+modern threat on search engines is that for neuro-based retrieval
+methods \cite{Mitra+al:18a}. It could be the case that adversarial
+attacks on neural methods used for vision and NLP applications as
+mentioned above will soon be translated to attacks on ranking methods.
+
+%A case in point, if an author is interested in
+%promoting her Web page for queries that touch on a specific topic, she
+%can potentially automatically generate parts of the page, or even the
+%entire page, so that it is biased for these queries. Regardless of
+%whether the generated content is fake, such a reality posts a real
+%threat to the search setting. 
+
+%At this point it is important to emphasize that it is not only
+%black-hat SEO, or more generally malicious actions, that can hurt the search echo system. For example, it has recent%ly been shown, both
+%theoretically and empirically, that the mere fact that some authors
+%are incentivized to compete for improved ranking yields, in completely
+%white hat settings, negative
+%impact on the search echo system; specifically, degrading topic
+%diversity in the corpus \cite{Basat+al:17a,Raifer+al:17a}\footnote{Jones et al. \cite{Jones+al:09a} observed simple %white hat phenomena in
+%anchor texts that negatively affected search effectiveness. This led them to the conclusion that ``not all content that complicates ranking is also spam'' \cite{Jones+al:09a}.}.
+
+One of the important implications of the reality just described is that Web document authors who will
+not have at their disposal automatic tools for content creation and
+manipulation, and more specifically, for automatic white-hat SEO which
+will help their documents to be highly ranked when they deserve to,
+will not be competitive in the adversarial search setting. This implication, together with the fact
+that creating benchmarks that will allow
+to research dynamic and adversarial search settings remains
+highly difficult to impossible to achieve, motivate our work.
+That is, given the increased ability to hurt the search echo
+system, we strive to counter balance it by developing legitimate, white hat, tools that can (i) help Web authors in the competitive search setting
+without hurting the search echo system, and (ii) be used for creating
+publicly available benchmarks that will allow to study competitive and
+adversarial dynamic search settings.
+Specifically, we present the first, to the best of our knowledge,
+attempt to devise an automatic method of ``legitimate'', white hat, content modification of documents. The goal of the modification is promotion in rankings
+induced by a non-disclosed relevance ranking function for a given
+query. The method can observe past rankings for the query
+which are the only signals about the ranking function. By
+``legitimate'' modification we mean a change that maintains the
+document's content quality in contrast to black hat SEO
+\cite{Gyongyi+Molina:05a}. 
+
+Our method replaces a short passage of the
+document with another short passage from a candidates pool.
+We cast this passage replacement task as a learning-to-rank (LTR) \cite{Liu:11a} problem over passage pairs:
+a passage in the document and a
+candidate passage for replacement. The optimization goal for
+training the LTR function is bi-objective: rank promotion and
+content-quality maintenance which we address via presumed coherence maintenance.
+%\footnote{A ``legitimate'' document modification should also not result in significant content drift. Our method implicitly addresses this aspect as well, but its formal treatment in terms of loss function, inter alia, is left for future work.}.
+The highest
+ranked passage pair is selected for the replacement.
+
+%The features we
+%devise are either related to potential rank promotion or to the
+%presumed coherence of the document after the passage replacement.
+
+%The candidate passages for replacing a passage in the given document
+%can be automatically generated from scratch or by paraphrasing
+%passages  in  the  document  or  those  in  other  documents  in  the
+%corpus. Since our focus here is  on the passage-pair ranking task, and
+%the proof of concept of the general approach, we leave the treatment of the candidate generation task for future work. For candidates we simply use passages that are part of documents that were highly ranked for the query
+%in past rankings. This practice follows recent findings about strategies employed by authors for rank-promoting their documents \cite{Raifer+al:17a}: they mimic
+%content in documents highly ranked in the past for the query of
+%interest. Obviously, in practical applications, such passage candidates would have to first be paraphrased to avoid copyright issues. We hasten to point out, however, that our method is not committed to a specific approach of generating the candidate passages.
+
+%to use for replacement can be
+%automatically generated either from scratch or as paraphrases of
+%passages of other documents in the corpus. 
+
+
+%By the virtue of replacing a short passage of the
+%document, and the criteria used in our approach for selecting the
+%passage to be replaced and that which replaces it, the content of the
+%resultant document remains faithful to that of the original
+%document.
+
+%The candidate passages for replacing a passage in the given
+%document are part of documents that are highly ranked for the query
+%in the current ranking. The rationale behind using these passages is based on
+%recent findings with regard to an effective strategy of authors in
+%promoting their documents in rankings \cite{Raifer+al:17a}: they mimic
+%content in documents highly ranked in the past for the query of
+%interest. Indeed, induced rankings are the only signal about the
+%non-disclosed ranking function.
+
+
+
+%Offline empirical evaluation attests to the effectiveness of our
+%passage-replacement approach in producing coherent documents that are
+%promoted in rankings.
+
+We evaluated our approach by using it as a bot
+in content-based ranking competitions we organized between students.
+%(cf., \citet{Raifer+al:17a}).
+%The
+%students authored documents and were incentivized to modify them
+%throughout the competition in response to induced rankings so as to
+%promote them in future rankings.
+We will make the dataset and code publicly available upon publication
+of the paper. The competitions were approved by international and institutional ethics committees.
+In the competitions, the bot produced documents which were promoted in
+rankings to a larger extent than the students' documents. Furthermore,
+the bot's content modifications did not hurt relevance in
+contrast to students' modifications of their documents, and maintained
+content quality to a large extent.
+
+Hence, although simple, our approach constitutes a first {\em
+  scientific} proof of concept for the feasibility of manipulating
+document content for rank promotion in search engines while
+maintaining the document quality. It is important to keep in mind that
+our focus in this paper is on the basic task of selecting passages of
+the document, and passages from some given pool, to perform the
+replacement. Creating the pool of candidates for replacement is an
+important task at its own right which we discuss as a future work;
+e.g., leveraging the recent significant progress in automatic language
+generation capabilities mentioned above. For the proof
+of concept in this paper, we simply used a pool of passages extracted
+from other documents which were ranked high for the given query in
+past rankings. The motivation for this practice is based on some recent observations about SEO strategies
+employed by publishers \cite{Raifer+al:17a}; namely, that they tend to mimic documents highly ranked in the past. Obviously, this is not
+a practical solution for pool generation due to copyright issues, but rather a
+means to our end of evaluating our proposed learning-based approach for passage
+replacement. In addition to devising methods for creating a pool of candidate passages, moving towards a practical application of our approach
+will call for introducing modifications which are not
+content-based. While content-based features are extremely important in
+Web ranking functions \cite{Liu:11a}, there are other types of important features.
+
+Worries about potential abuse of our method for black hat SEO can be
+alleviated: the method is tuned for maintaining content
+quality. Furthermore, as the ranking competitions show, the method's
+potential negative effects on the search echo system are not significant, and can be smaller than
+those introduced by human authors who try to promote documents. Dropping the
+constraint of quality maintenance in our method will result in the produced
+documents being of low quality. But in this case, simple quality estimates used in Web
+search methods \cite{Bendersky+al:11b} can be used to easily disqualify these documents or penalize them in rankings.
+
+
+%Hence, although simple, our approach constitutes a first {\em
+%  scientific} proof of concept for the feasibility of manipulating
+%document content for rank promotion in search engines while
+%maintaining the document quality. It is important to keep in mind that
+%our focus in this paper is on the basic task of selecting passages of
+%the document, and passages from some given pool, to perform the
+%replacement. Creating the pool of candidates for replacement is an
+%important task at its own right which we discuss as a future work;
+%e.g., leveraging the recent significant progress in automatic language
+%generation capabilities developed in the NLP community. For the proof
+%of concept in this paper, we simply used a pool of passages extracted
+%from other documents which were ranked high for the given query in
+%past rankings following some recent observations about SEO strategies
+%employed by publishers \cite{Raifer+al:17a}; namely, that they tend to mimic documents highly ranked in the past. Obviously, thi%s is not
+%a practical solution for pool generation due to copyright issues, but rather a
+%means to our end of evaluating our proposed learning-based approach for passage
+%replacement. In addition to devising methods for creating a pool of candidate passages, moving towards a practical application o%f our approach
+%will call for introducing modifications which are not
+%content-based. While content-based features are extremely important in
+%Web ranking functions \cite{Liu:11a}, there are other types of important features.
+
+The line of research we pursue here 
+is important not only for
+document authors so as to ``keep up'' with the ranking game in a legitimate manner, but also for those who devise ranking functions in
+adversarial retrieval settings. That is, having document modification
+methods and bots will allow to create a myriad of experimental settings, and more
+generally benchmarks which do not exist today for studying dynamic retrieval settings, even if in our case, these are white hat.
+%Such benchmarks will help the development of more robust ranking functions.
+
+\endinput
+We present the first --- to the best of our knowledge --- study of the idea of devising a bot that serves as a player, competing with human players (document authors), in the ranking competition described above. More specifically, we set out to devise an agent that modifies the content of a given document so as to have it more highly ranked for a query of interest in future rankings. We impose the constraint that the content modifications applied by the agent do not hurt the quality of the document; e.g., in terms of coherence. These ``legitimate'' content modifications stand in contrast to spamming, and more generally, black-hat search engine optimization (SEO) \cite{Gyongyi+Molina:05a}. In other words, the document modifications the agent is allowed to employ are white hat (legitimate) SEO \cite{Gyongyi+Molina:05a}. Thus, our work fits and complements the multi-agent systems literature considering agents who play incomplete information games facing humans (see Peled et al. \cite{Peled+al:13a} for example).
+
+%In our setting, though the game is the classical search / ad-hoc information retrieval setting on content ranking. In reality the game (ranking function in this case) is unknown and players (document authors) try to promote their documents, while trying not to move away too much from their original content (unless they are spammers), as being higher in the ranking leads to higher utility. In this paper we study for the first time the idea of an agent who automatically promotes content ranking while maintaining its coherency, in competition with humans who aim at promoting their contents.
+
+Our agent replaces a short passage of the
+given document with another short passage from a candidates pool.
+We cast this passage replacement task as a learning-to-rank (LTR) \cite{Liu:11a} problem over passage pairs:
+a passage in the document and a
+candidate passage for replacement. That is, we employ a supervised approach to learn how to rank passage pairs.
+The optimization goal for
+training the LTR function is bi-objective: rank promotion and
+content-quality maintenance which we address via presumed coherence maintenance.
+The highest
+ranked passage pair is selected for the replacement.
+
+%In this sense, our work is in the spirit of work on multi-agent systems which integrate features of observed social and psychological behavior in service of agents' creation; e.g. \cite{Azaria+al:16a}, \cite{Azaria+al:12a},\cite{Melo+al:14a}, \cite{Prada+Paiva:09a}. Rather than using a machine learning approach for human choice prediction (see, for example, Rosenfeld and Kraus \cite{Rosenfeld+Kraus:18a}, Plonski et al. \cite{Plonski+al:17a} and Altman et al. \cite{Altman+al:06a} for general discussion/approaches), we employ a learning approach to select passages to be replaced and those which replace them. 
+
+We evaluated our agent by using it as a bot
+in content-based ranking competitions we organized between students.\footnote{As we describe in Section \ref{sec:eval}, the ranking competitions were approved by two ethics committees --- an international committee and an institutional committee.}
+We will make the dataset and code publicly available upon publication
+of the paper. The bot produced documents which were promoted in
+rankings to a larger extent than the students' documents. Furthermore,
+the bot's content modifications did not hurt relevance for queries in
+contrast to students' modifications of their documents, and maintained
+content quality to a large extent.
+
+
+%Hence, although simple, our approach constitutes a first {\em
+%  scientific} proof of concept for the feasibility of manipulating
+%document content for rank promotion in search engines while
+%maintaining the document quality.
+
+
+
+
+We note that worries about potential abuse of our agent for black-hat
+SEO can be alleviated: the agent is tuned for maintaining content
+quality. Furthermore, as the ranking competitions we organized show, the agent's
+adversarial effects on the search echo system can be smaller than
+those of human players (authors) who try to promote documents. In that respect,
+we view this line of research as important for publishers of
+legitimate documents for improving their documents by using agents as that we describe here for the sake of {\em justified} rank promotion 
+
+The line of research pursued here is important not only for
+publishers, but also for those who devise ranking functions in
+adversarial retrieval settings. That is, having document modification
+agents will allow to create a myriad of experimental settings, and more
+generally benchmarks which do not exist today\footnote{The main exception are spam datasets, but spam is a very small part of the SEO realm, and is not white-hat SEO.}. These will help the development of more robust ranking functions. Indeed, there is much work on devising adversarial attacks on machine learning algorithms in general, and neural networks in particular, that helps to improve the core algorithms; e.g., Huang et al. \cite{Huang+al:17a}, Papernot et al. \cite{Papernot+al:17a} and Kreuk et al. \cite{Kreuk+al:18a}. Along the same lines, throughout the decades, published work in the crypto community of successful attacks on crypto mechanisms helped to push forward improved mechanisms.
+
+The paper is structured as follows. In Section \ref{sec:rel} we survey additional related work which was not already discussed. Section \ref{sec:framework} presents the algorithmic design of our agent. The empirical evaluation of the agent, both via live ranking competitions against humans and offline evaluations, is presented in Section \ref{sec:eval}. We conclude and describe several future directions in Section \ref{sec:conc}.
+
+%replacement. In addition to devising methods for creating a pool of candidate passages, moving towards a practical application of our approach
+%will call for introducing modifications which are not
+%content-based. While content-based features are extremely important in
+%Web ranking functions \cite{Liu:11a}, there are other types of important features.
+
+\endinput
+
+
+Our work fits and complements the multi-agent systems literature considering agents who play incomplete information games facing humans (see e.g. \cite{Peled+al:13a}). In our case though the game is the classical search / ad-hoc information retrieval setting on content ranking. In reality the game (ranking function in this case) is unknown and players (document authors) try to promote their documents, while trying not to move away too much from their original content (unless they are spammers), as being higher in the ranking leads to higher utility. In this paper we study for the first time the idea of an agent who automatically promotes content ranking while maintaining its coherency, in competition with humans who aim at promoting their contents.
+
+Our approach is inspired by very recent work in the information retrieval community on the tendency of authors to mimick content of highly ranked publishers in order to promote their content \cite{Nimrod}.
+In this sense our work is in the spirit of work in multi-agent systems which integrates features of observed social and psychological behavior  in service of agents' creation (e.g. \cite{Azaria+al:16a}, \cite{Azaria+al:12a},\cite{Melo+al:14a}, \cite{Prada+Paiva:09a}) . Rather than using a machine learning approach for human choice prediction (see e.g. \cite{Rosenfeld+Kraus:18a,Plonski+al:17a,Altman+al:06a} for general discussion/approaches) we employ a learning approach for the selection of the passages to be modified and the ones to be inserted.
+It yields the first automated agent for coherent content promotion in information retrieval games.
+
+
+
+\endinput
+
+----------------
+Ref1
+
+@inproceedings{DBLP:conf/aaai/PeledGK13,
+  author    = {Noam Peled and
+               Ya'akov (Kobi) Gal and
+               Sarit Kraus},
+  title     = {An Agent Design for Repeated Negotiation and Information Revelation
+               with People},
+  booktitle = {Proceedings of the Twenty-Seventh {AAAI} Conference on Artificial
+               Intelligence, July 14-18, 2013, Bellevue, Washington, {USA.}},
+  year      = {2013}}
+
+-------------------------------
+Ref2
+  Azaria, A.; Rabinovich, Z.; Kraus, S.; Goldman, C. V.; and
+Gal, Y. 2012a. Strategic advice provision in repeated humanagent
+interactions. In Proceedings of AAAI, 1522–1528.
+
+----------------------------------------------
+
+Ref3
+Azaria, A.; Rabinovich, Z.; Kraus, S.; Goldman, C. V.; and
+Tsimhoni, O. 2012b. Giving advice to people in path
+selection problems. In Proceedings of the 11th International
+Conference on Autonomous Agents and Multiagent
+Systems-Volume 1, 459–466. International Foundation for
+Autonomous Agents and Multiagent Systems.
+
+------------------------------------
+Ref4
+
+De Melo, C. M.; Gratch, J.; and Carnevale, P. J. 2014. The
+importance of cognition and affect for artificially intelligent
+decision makers. In Proceedings of AAAI, 336–342.
+-------------------------------------------------
+
+Ref5
+
+Prada, R., and Paiva, A. 2009. Teaming up humans with
+autonomous synthetic characters. Artificial Intelligence
+173(1):80–103.
+-----------------------
+Ref6
+
+@book{DBLP:series/synthesis/2018Rosenfeld,
+  author    = {Ariel Rosenfeld and
+               Sarit Kraus},
+  title     = {Predicting Human Decision-Making: From Prediction to Action},
+  series    = {Synthesis Lectures on Artificial Intelligence and Machine Learning},
+  publisher = {Morgan {\&} Claypool Publishers},
+  year      = {2018}}
+---------------------------------
+Ref7
+
+@inproceedings{DBLP:conf/aaai/PlonskyEHT17,
+  author    = {Ori Plonsky and
+               Ido Erev and
+               Tamir Hazan and
+               Moshe Tennenholtz},
+  title     = {Psychological Forest: Predicting Human Behavior},
+  booktitle = {Proceedings of the Thirty-First {AAAI} Conference on Artificial Intelligence,
+               February 4-9, 2017, San Francisco, California, {USA.}},
+  pages     = {656--662},
+  year      = {2017}}
+
+
+----------------
+Ref8
+
+@inproceedings{DBLP:conf/ecml/AltmanBT06,
+  author    = {Alon Altman and
+               Avivit Bercovici{-}Boden and
+               Moshe Tennenholtz},
+  title     = {Learning in One-Shot Strategic Form Games},
+  booktitle = {Machine Learning: {ECML} 2006, 17th European Conference on Machine
+               Learning, Berlin, Germany, September 18-22, 2006, Proceedings},
+  pages     = {6--17},
+  year      = {2006}}
+
+
+
+
+%providing documents' authors in
+%competitive retrieval settings with effective automatic
+%content-modification assistants for {\em legitimate}
+%rank promotion. We believe that this is just a first step given the
+%significant progress in automatic language generation capabilities
+%developed in the NLP community.
+
+
+
+%contribution to the search echo system in terms of document relevance surpasses that of 
+%human authors who try to promote documents.
+
+%That is, the method produces documents of higher quality and relevance. Therefore, search engines need not fight such methods, but rather encourage them as they help to better represent documents.
+
+%The effectiveness of our method provides clear motivation for
+%developing much more evolved approaches of content modification for
+%rank promotion --- e.g., using language generation. Furthermore, the importance% of the 
+
+
+
+\endinput
+
+
+

@@ -1,0 +1,58 @@
+
+\section{Coherence Evaluation}
+\begin{itemize}
+\item \textbf{Coh-Metrix: Analysis of text on cohesion and language} - Graesser et al. '04; A tool for text analysis in terms of cohesion and readability. 
+\item \textbf{Automatic Evaluation of Text Coherence: Models and Representations} - Barzilay and Lapata '05; This paper describes a method for automatic evaluation of text coherence. They divide their method into two parts: (i) Syntactic view - local entity transitions between sentences (measuring the probability of entity transitions between sentences), (ii) Semantic view - measuring the degree sentences are linked together (basically sum of similarities between sentences divided by number of sentences).
+
+\item \textbf{Revisiting Readability: A Unified Framework for Predicting Text Quality} - Pitler and Nenkova '08; This paper describes a predictive model for human readability while linking readability with coherence. In order to measure coherence they use features similar to Barzilay and Lapata 05' but also add discourse relations feature : they compute the likelihood of a text w.r.t. the multinomial distribution of discourse relations of words in the text.
+
+\item \textbf{Automatically Evaluating Text Coherence Using Discourse Relations} - Lin et al '11; This paper describes a model to represent and assess the discourse coherence of text. They discuss the fact that measuring coherence simply by observing the discourse transitions between sentences in short texts is problematic due to a sparsity problem. Hence, they introduce the concept of discourse role matrix. This matrix represents the different discourse roles of the \textbf{terms} across the continuous text units (e.g. sentences). The \textbf{global} coherence probability is then calculated using the \textbf{local} roles of terms in the text units.
+
+
+
+\item \textbf{Neural Net Models of Open-domain Discourse Coherence} - Li and Jurafsky '17; This paper describes different neural models that measure different aspects of text coherence. They present both discriminative models which induce coherence by learning that human generated text is coherent and a permutation of the sentences is considered non-coherent and generative models that are based on guessing the next sentence given the preceding one - measuring coherence by the likelihood of generating sentence $s_{i+1}$ given $s_i$.
+
+\end{itemize}
+
+
+\section{Coherent Text Generation}
+\begin{itemize}
+\item \textbf{Globally Coherent Text Generation with Neural Checklist Models} - Kiddon et al. '16; They present the "Neural check-list" model - RNN that models global coherence by storing and updating an agenda of text strings which should be mentioned somewhere in the output. The description of architecture: (i) an encoder-decoder language model that generates goal-oriented text, (ii) an attention model that tracks remaining agenda items that need to be introduced, and (iii) an attention model that tracks the used, or checked, agenda items.
+
+\item \textbf{A Latent Variable Recurrent Neural Network
+for Discourse Relation Language Models} Ji et al. '16; This paper presents a novel latent variable recurrent neural network architecture for jointly
+modeling sequences of words and (possibly latent) discourse relations between adjacent sentences. The model treats shallow discourse structure —specifically, the relationships between pairs of adjacent sentences as a latent variable 
+
+
+\item \textbf{Long Text Generation via Adversarial
+Training with Leaked Information} - Gou et al. '18; Present the LeakGAN architecture. It allows the discriminative net to leak its own high-level extracted features to the generative net to further help the guidance. 
+
+
+
+\end{itemize}
+
+\section{Sentence Representations via Coherency Signals}
+\begin{itemize}
+
+\item \textbf{Skip Thought Vectors} - Kiros et al '15; They describe an approach for unsupervised learning of a generic, distributed sentence encoder. Using the continuity of text from books, they train an encoder-decoder model that tries to reconstruct the surrounding sentences of an encoded passage. Sentences that share semantic and syntactic properties are thus mapped to similar vector representations. The model is called Skip-Thoughts. They use a large corpus of novels (BookCorpus) for training the model. The method is based on an encoder that maps words to a sentence vector and a decoder is used to generate the surrounding sentences. The objective optimized is the sum of the log-probabilities
+for the forward and backward sentences conditioned on the encoder representation.
+
+\item \textbf{Follow-up work}-  Hill et al. '16,  Gan et al. '16, Ramachandran et al. '16: Propose improvements to Kiros's model. All three approaches are based on explicitly generate full sentences during training time in order to learn powerfull sentence representations that are based on semantic context.
+
+\item \textbf{Discourse-Based Objectives
+for Fast Unsupervised Sentence Representation Learning} - Jernite et al. '18; They propose three objective functions for use over paragraphs extracted from unlabeled text. Each captures a different aspect of discourse coherence and together the three can be used to train a single encoder to extract broadly useful sentence representations. The objectives are:
+\begin{enumerate}
+\item \textbf{Binary sentence ordering}: Many coherence relations have an inherent direction. E.g. if sentence $S_1$ is and elaboration of sentence $S_0$ then $S_0$ is generally not an elaboration of $S_1$. Hence, the first task consists in taking pairs of adjacent sentences from texts, switching their order with probability 0.5,
+and training a model to decide whether they have been switched.
+
+\item \textbf{Next sentence}: Many coherence relations are transitive by nature, so that any two sentences from the same paragraph will exhibit some coherence. However, two adjacent sentences will generally be more coherent than two more distant ones. The described task is  given the first three sentences of a paragraph and a set of five candidate sentences from later in the paragraph, the model must decide which candidate immediately follows the initial three in the source text. 
+
+\item \textbf{Conjunction Prediction}: information about the coherence relation between two sentences is sometimes apparent in the text: this is the case whenever the second sentence starts with a conjunction phrase. They created a list of conjunction phrases and group them into nine categories. Then they extract from their source text all pairs of sentences where the second starts with one of the
+listed conjunctions. They give the system the pairs without the phrase, and train it to recover the conjunction category.
+\end{enumerate}
+
+
+
+\end{itemize}
+
+

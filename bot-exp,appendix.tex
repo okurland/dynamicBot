@@ -1,0 +1,100 @@
+\section{Appendix}
+We next provide some additional technical details about the
+experimental setting.
+\subsection{Document Ranking Function}
+\label{sec:rankFuncApp}
+For document ranking, we used the same learning-to-rank approach, and features, used by \citet{Raifer+al:17a} in their fundamental ranker. Specifically,
+the state-of-the-art LambdaMART learning-to-rank (LTR) approach
+\cite{Wu+al:10a}\footnote{We used the RankLib implementation: \url{www.lemurproject.org/ranklib.ph}.}  was used with $25$ content-based features. (Recall that
+we focus on content-based modifications.) These features were either
+used in Microsoft's learning-to-rank datasets\footnote{\url{https://tinyurl.com/rmslr}}, or are query-independent document
+quality measures --- specifically, stopword-based measures and the
+entropy of the term distribution in a document --- demonstrated to be
+effective for Web retrieval \cite{Bendersky+al:11a}.
+
+To train the ranking function, we used the ClueWeb09 Category B collection
+and its $200$ topic-title queries (TREC $2009$-$2012$). We used the query likelihood retrieval approach \cite{Song+Croft:99a} with Dirichlet
+smoothed document language models; the smoothing parameter was set to
+$1000$~\cite{Zhai+Lafferty:01a}. Documents assigned a score below $50$
+by Waterloo's spam classifier were removed from rankings. The resultant top-$1000$ documents were used for training. We used default
+values of the free parameters in the implementation except for the number of leaves and trees
+which were selected from $\set{5,10,25,50}$ and $\set{250,500}$,
+respectively, using five-fold cross validation performed over queries:
+four folds were used for training and one for validation of these two
+parameters; NDCG@5 was the optimization criterion. We select the
+parameter values that result in the best NDCG@5 over all $200$ queries
+when these were used as part of the validation folds.
+
+ 
+\subsection{Training Our Approach for Ranking Passage Pairs}
+\label{sec:offlineApp}
+Our approach is based on ranking for a given document $\curDoc$, which we want to rank-promote, passage pairs
+$(\psgSrc,\psgTarget)$, where $\psgSrc$ is a passage in $\curDoc$ and $\psgTarget$ is a
+passage in a document among the most highly ranked in the current
+ranking, $\curRank$. (Refer back to Sect. \ref{sec:framework} for
+details.)  We use a learning-to-rank method to learn a passage-pair ranker and to apply it. To train our approach, we used all $31$ queries and all the
+documents submitted for these queries in round $6$ of Raifer et al.'s
+competition\footnote{In round $5$ of Raifer et al.'s
+  competition, the incentive system has changed
+  \cite{Raifer+al:17a}. Hence, we selected a round which is after the
+  change.}, except for those which were not marked as of high quality
+by at least $3$ out of $5$ crowdsourcing annotators
+\cite{Raifer+al:17a}. To induce document ranking, we used the 
+ranking function from Sect. \ref{sec:rankFuncApp} which was also used in the ranking competitions. Recall that our approach has no knowledge of the document ranking
+function.
+
+We let our approach modify a document, $\curDoc$, which is either the
+lowest ranked or the second highest ranked 
+for a query. Thus, we have a mix of low ranked and high ranked
+documents which we let our approach train with. As a result, for each
+query, we consider two identical current rankings, $\curRank$, over
+the given documents. In each of these two rankings, a single document
+--- ranked second or last --- is designated as $\curDoc$. And, we
+induce two new rankings, $\nextRank$, where $\curDoc$ was modified by
+our approach to $\newDoc$. The remainder of the documents are not modified;
+i.e., we train our approach by assuming that other documents do
+not change\footnote{The alternative would have been to have other
+  documents modified simultaneously to $\curDoc$. However, this would have introduced much noise
+  to the learning phase as the ranking of $\newDoc$ could have
+  changed with respect to that of $\curDoc$ not necessarily due to the modification of $\curDoc$, but rather
+  due to those of others.}. Our training dataset contains $57$ documents which serve for $\curDoc$ with overall $3399$ passage pairs $(\psgSrc,\psgTarget)$. For each document there are, on average, $59.6$ such pairs (with standard deviation of $42.32$) that are to be ranked.
+
+Some of the features on which our approach relies, namely
+{\simSrcPrevTopTF}, {\simTargetPrevTopTF}, {\simSrcPrevTopWtV} and
+{\simTargetPrevTopWtV}, utilize information about the past $p$
+rankings. Thus, as was the case above in the online evaluation, we let
+our approach observe all current and past rankings (i.e., $p=6$) where these were
+induced using our ranking function over the documents in each of the
+first five rounds of Raifer et al.'s competition \cite{Raifer+al:17a}.
+
+As noted in Sect. \ref{sec:framework}, any feature-based
+learning-to-rank approach can serve for our passage-pair ranking
+function. Since we do not have large amounts of training data, we used
+a linear RankSVM~\cite{Joachims:06a}\footnote{\url{https://www.cs.cornell.edu/people/tj/svm_light/svm_rank.html}};
+all free parameters were set to default values of the implementation,
+except for $C$ which was set using cross validation. Specifically, we
+used $5$ fold cross validation over all $57$ documents\footnote{Recall that ranking of passage pairs is performed with respect to a specific document $\curDoc$.} which serve as $\curDoc$, where $4$ folds were used to train RankSVM and the one fold (validation) was used to
+set $C$'s value ($\in \set{0.001. 0.01, 0.1}$) by optimizing for
+NDCG@5. As each document is part of a single validation fold, we set $C$ to the value that optimized NDCG@5 over all documents when these were part of a validation fold. The trained approach was then used for the bot in the online evaluation --- i.e., ranking competitions.
+
+As described in Sect. \ref{sec:framework}, our approach utilizes, as
+features, Word2Vec-based similarities. We train a 
+query-based Word2Vec model \cite{Diaz+al:16a} using the {\rm gensim}
+package\footnote{https://radimrehurek.com/gensim/models/word2vec.html}. Specifically,
+for a query $\query$, the model was trained on the top-$10000$ documents
+retrieved from ClueWeb09 Category B for $\query$ using the query likelihood retrieval model
+\cite{Song+Croft:99a}; spam removal was not applied here. Default parameter values of the {\rm gensim}
+package were used, except for the threshold of number of occurrences per word which
+was set to $0$, the window size which was set to $8$, and the vector size which was set to $300$.  
+
+\subsection{Offline Evaluation of the Passage-Pair Ranking} 
+The passage-pair ranking is performed for each $\curDoc$
+separately. Here, we used five-fold cross validation over all $57$
+documents which serve as $\curDoc$, with three folds used for training
+RankSVM, one fold (validation) for setting its $C$ value using the value
+range specified above, and one fold for testing. The optimization
+criterion for the validation was NDCG@5. Each document is part of a
+single test fold. We report for each evaluation measure the average of
+its values for all these documents ($57$ overall) when they were part
+of a test fold. 
+

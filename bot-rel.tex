@@ -1,0 +1,46 @@
+\section{Related Work}
+\label{sec:rel}
+There is a huge body of work on identifying and fighting black hat SEO, specifically,
+spam \cite{AIRWeb,Castillo+Davison:10a}. Our 
+approach is essentially a content-based white hat SEO method intended to promote
+{\em legitimate} documents in rankings via {\em legitimate}
+content modifications. We are not aware of past work on devising such
+automatic content modification procedures. 
+
+Our approach might seem at first glance conceptually similar to
+the black hat SEO {\em stitching} technique \cite{Gyongyi+Molina:05a}:
+authors of low-quality Web pages manually ``glue'' to their
+documents unrelated phrases from other documents. In contrast, our approach operates on descent quality
+documents and is optimized to maintain document quality.
+
+Our approach can conceptually be viewed as ranking-incentivized
+paraphrasing: modifying the document to promote
+it in rankings, but keeping content quality and having the content remain faithful to the original content. Past work on paraphrasing
+\cite{Androutsopoulos+Malakasiotis:10a} does not include methods
+intended to promote documents in ranking.
+%Yet, our approach of
+%replacing a passage with another is conceptually inspired by the general line of
+%work on passage-based paraphrasing (e.g., \cite{Barzilay+Lee:03a}).
+
+We use simple estimates (e.g., lexical and Word2Vec similarities) to
+measure the extent to which content coherence is maintained given the passage
+replacement. More evolved estimates can be used to this end \cite{graesser2004coh,lapata2005automatic,pitler2008revisiting,lin2011automatically,li2016neural}. Furthermore, one could modify the document using text-generation approaches that account for coherence \cite{kiddon2016globally,ji2016latent,guo2018long}, which we leave for future work.
+
+\endinput
+
+There is a line of work on query-biased/focused content summarization
+(e.g., \cite{Tombros+Sanderson:98a,Berger+Mittal:00a}). The main goal
+of these methods is to create snippets that can help users of search
+engines understand the relevance of retrieved documents to their
+queries. In contrast, our approach does not create a short summary of
+the given document, but rather modifies it for rank-promotion while maintaining coherence.
+
+%Recent work analyzes the content-based modification strategies of
+%documents' authors for promoting their documents in rankings
+%\cite{Raifer+al:17a}. The merits of mimicking content from documents
+%highly ranked in the past for queries of interest were theoretically
+%and empirically demonstrated. Our approach of replacing a passage in a document with a passage from a document highly ranked in the past for a query of interest is inspired by this strategy.
+
+
+
+

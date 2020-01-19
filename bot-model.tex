@@ -1,0 +1,208 @@
+\section{Content Modification Approach}
+\label{sec:framework}
+%Suppose that an author wrote a document with descent content
+%quality.
+Suppose that the author of a document with descent content quality would like the document to be highly ranked for a
+query $\query$ by a search engine whose ranking function is not
+disclosed. More specifically, the author observes the current ranking,
+$\curRank$, induced for $\query$, and her goal is to promote her
+document, $\curDoc$, in the next induced ranking, $\nextRank$,
+assuming that $\curDoc$ was not the highest ranked in $\curRank$. We
+present an approach to automatically modifying $\curDoc$'s content to
+this end, yielding a document $\newDoc$.\footnote{The ``next ranking''
+  is that induced after the search engine indexed
+  $\newDoc$ instead of $\curDoc$.}
+
+There are three desiderata for the content modification: (i) maximizing the likelihood that $\newDoc$ will be
+positioned in $\nextRank$ at a higher rank than $\curDoc$'s current
+rank in $\curRank$, (ii) maintaining content quality, 
+and (iii) having $\newDoc$ faithful to $\curDoc$ in
+terms of the provided information.
+
+%Thus, the desired modification
+%can be viewed as high quality paraphrasing which results in rank promotion.
+
+In reference to work on passage-based document paraphrasing (e.g.,
+\citet{Barzilay+Lee:03a}), we perform the content modification by
+replacing one of $\curDoc$'s short passages with another short passage from
+a given pool of candidates, $\psgPool$.\footnote{The approach does not depend on the passage-markup technique.} The goal is to optimize the replacement with respect to the desiderate mentioned above.
+We cast the task as a learning-to-rank challenge \cite{Liu:11a} over pairs of passages, $(\psgSrc,\psgTarget)$,
+where $\psgSrc \in \psgSet{\curDoc}$ and $\psgTarget \in \psgPool$;
+$\psgSet{\curDoc}$ is the set of $\curDoc$'s passages. The highest ranked pasage pair is used for replacement. 
+
+Candidate passages in the pool $\psgPool$ can be created in various
+ways; e.g., from scratch, or by paraphrasing passages in $\curDoc$ or
+those in other documents. However, our focus here is on the passage-pair
+ranking challenge, and more generally, on the first proof of concept for the content-modification challenge we pursue. Hence, we used a simple approach to create $\psgPool$
+following recent findings about strategies employed by
+documents' authors to promote their documents in rankings \cite{Raifer+al:17a}: authors tend to mimic content in documents that were highly
+ranked in the past for a query of interest. The
+merits of this strategy were demonstrated using theoretical and
+empirical analysis \cite{Raifer+al:17a}. The simple motivation behind this strategy is
+that induced rankings are the only (implicit) signal about the ranking
+function, and documents highly ranked are examples for what the
+ranking function rewards. Accordingly, here, $\psgPool$ is
+the set of all passages in documents ranked higher than $\curDoc$ in
+$\curRank$. In practical applications, these passages will not be used directly to avoid copyright issues. For example, they can be paraphrased --- a challenge we leave for future work.
+
+
+
+\subsection{Learning to Replace Passages}
+\label{sec:labels}
+To devise a ranking function over passage pairs, we represent
+each pair, $(\psgSrc,\psgTarget)$, as a feature vector; the features
+are described in Section \ref{sec:features}.
+
+%We start by describing in
+% the optimization goal for the learning phase.
+
+%\subsubsection{Rank promotion and content quality}
+
+The ranking function should be optimized for the
+three desiderata described above. Here we focus on the first two ---
+rank promotion and maintaining content quality. Since content quality
+is a difficult notion to quantify, we set as a goal to not
+significantly hurt ``local coherence'' in terms of the passage relations (e.g., semantic similarities) to its surrounding passages.
+
+
+
+
+%by the passage replacement. We measure
+%local coherence using simple features that rely on semantic similarities 
+%between a passage and its ambient document and surrounding
+%passages.
+
+We do not directly address the 
+desideratum of $\newDoc$'s faithfulness to $\curDoc$. Yet, using the coherence-based features suggested below and the fact that $\psgSrc$ and $\psgTarget$ are short passages help to 
+keep $\newDoc$ ``semantically similar'' to $\curDoc$.
+
+Our passage-pair ranking function is optimized, simultaneously,
+for achieving rank promotion and maintaining local coherence. This is a dual-objective
+optimization. Inspired by work on learning Web ranking functions
+with a dual objective: relevance and freshness
+\cite{Dong+al:10a,Dong+al:10b,Dai+al:11a}, we use labels which are aggregates of rank-promotion and coherence labels. 
+
+Specifically, if $\curDoc$ is a document in the training data, and $\curRank$ is the current ranking it is part of, we
+produce a rank-promotion label $\rankPromoteLabel$ with values in
+$\set{0, 1, \ldots, 4}$ and a local-coherence maintenance label $\coherenceLabel$ with
+values in $\set{0, 1, \ldots, 4}$ for each pair $(\psgSrc,\psgTarget)$
+in $ \psgSet{\curDoc} \times \psgPool$.
+%The coherence label attests to the coherence of $\newDoc$ which was created from $\curDoc$ by replacing $\psgSrc$ with $\psgTarget$.
+Details about producing these labels are provided in Section
+\ref{sec:eval}. We then produce a single label $l$ ($\in \set
+    {0,\ldots,4})$ for $(\psgSrc,\psgTarget)$ by aggregating
+    $\rankPromoteLabel$ and $\coherenceLabel$ using the (smoothed) harmonic mean \cite{Dai+al:11a}:
+    $l \definedas
+    \frac{(1+\beta^2)\rankPromoteLabel
+      \coherenceLabel}{\rankPromoteLabel + \beta^2 \coherenceLabel +
+      \epsilon}$, where $\beta$ is a free parameter that controls the
+    relative weight assigned to the rank-promotion and coherence
+    labels, and $\epsilon = 10^{-4}$ is a smoothing parameter.
+    %In
+    %Section \ref{sec:eval} we demonstrate the merits of this label
+    %aggregation approach with respect to other alternatives.
+
+We can now use these labels that quantify, simultaneously,
+rank-promotion and local coherence maintenance, in any learning-to-rank approach
+\cite{Liu:11a}, to learn a ranking function for passage pairs. The
+labels are also used for (offline) evaluation of the ranking function.
+
+
+\subsubsection{Features for Passage Pairs}
+\label{sec:features}
+The passage pair $(\psgSrc,\psgTarget)$ is represented by a feature
+vector with two types of features: those that target potential rank
+promotion as a result of moving from $\curDoc$ to $\newDoc$, and those that target the
+change of local coherence as a result of this move. None of the features is based on assuming knowledge of the ranking function for which promotion is sought.
+
+Herein, if $x$ is a document or a passage, we use
+$\tfVec{x}$ to denote the TF.IDF vector representing $x$ and
+$\wVec{x}$ to denote its Word2Vec-based vector representation \cite{Mikolov+al:13a}: we average
+the Word2Vec vectors of terms in a passage to yield a passage vector,
+and we average the resultant vectors of passages in a document to yield a document
+vector. We provide details of training Word2Vec in the appendix. We measure the similarity between two
+%(TF.IDF-based or Word2Vec-based)
+vectors using the cosine measure.
+
+
+\myparagraph{Rank-promotion features}
+%The rank-promotion features that we present now are intended to derive an (implicit) estimate for the likelihood that $\newDoc$, which was attained from $\curDoc$
+%by replacing $\psgSrc$ with $\psgTarget$, will be positioned in $\nextRank$ at a rank position that is higher than that of $\curDoc$ in $\curRank$. 
+
+The \qryTermSrc and \qryTermTarget features are the fraction of
+occurrences of $\query$'s terms in $\psgSrc$ and $\psgTarget$,
+respectively. The assumption is that the retrieval score assigned by
+any retrieval method to a document increases with increased frequency of query terms. 
+
+The {\simSrcTopTF}, {\simTargetTopTF}, {\simSrcTopWtV} and
+{\simTargetTopWtV} features are
+$\cos(\tfVecParm{\psg}{src},cent^{T}_{\curRank})$, $\cos(\tfVecParm{\psg}{target},cent^{T}_{\curRank})$,
+$\cos(\wVecParm{\psg}{src},cent^{W}_{\curRank})$ and
+$\cos(\wVecParm{\psg}{target},cent^{W}_{\curRank})$, respectively; $cent^{T}_{\curRank}$ and
+$cent^{W}_{\curRank}$ are the arithmetic mean (centroids) of the $m$ TF.IDF-based
+and Word2Vec-based vectors, respectively, that represent the $m$ most
+highly ranked documents in the current ranking $\curRank$ that are also ranked
+higher than $\curDoc$. We set the maximum value of $m$ to $3$. Since
+the ranking function is not known, similarity to top-retrieved
+documents can attest to some extent to increased retrieval score.
+
+The next four features are based on the assumption that similarity of a passage to documents which were highly ranked in the past for the query can attest to improved retrieval score.
+%the older the ranking, the smaller the weight of the corresponding top document in the centroid. 
+Formally, we observe the $p$ past and current rankings induced for $\query$:
+$\genRank_{-1}, \genRank_{-2}, \ldots$, $\genRank_{-p}$; $\genRank_{-1}$ is the current ranking $\curRank$ and $\genRank_{-2}$ is the previous ranking; $p$ is a free parameter. Let $\doc_{\genRank_{-i}}$ be the document
+most highly ranked in $\genRank_{-i}$; we set $cent^{T}_{\genRank_{past}}
+  \definedas \sum_{i=1}^{p} w_i \tfVecParm{\doc}{\genRank_{-i}}$ and
+    $cent^{W}_{\genRank_{past}} \definedas
+      \sum_{i=1}^{p} w_i \wVecParm{\doc}{\genRank_{-i}}$; $w_i$ is a time-decay-based weight:
+$w_i \definedas \frac{\alpha \exp (-\alpha i )  }{\sum_{j=1}^{p} \exp (-\alpha
+  j)}$, which is inspired by work on time-based
+language models \cite{Li+Croft:03a} with $\alpha=0.01$ \cite{Li+Croft:03a}. Then, the features {\simSrcPrevTopTF}, {\simTargetPrevTopTF}, {\simSrcPrevTopWtV} and
+{\simTargetPrevTopWtV} are defined as
+$\cos(\tfVecParm{\psg}{src},cent^{T}_{\genRank_{past}})$, $\cos(\tfVecParm{\psg}{target},cent^{T}_{\genRank_{past}})$, $\cos(\wVecParm{\psg}{src},cent^{W}_{\genRank_{past}})$ and
+$\cos(\wVecParm{\psg}{target},cent^{W}_{\genRank_{past}})$, respectively.
+%$cent^{T}_{\genRank_{past}}$ and $cent^{W}_{\genRank_{past}}$ are the
+%centroids of the TF.IDF-based and Word2Vec-based vectors,
+%respectively, that represent each of the highest ranked documents in
+%the observed rankings: $\genRank_{-1}, \genRank_{-2}, \ldots,
+%\genRank_{-p}$. Formally,
+
+\myparagraph{Coherence-maintenance features}
+The next features, all
+based on Word2Vec similarities, address local coherence. The {\simSrcTargetWtV} feature is: $\cos
+(\wVecParm{\psg}{src},\wVecParm{\psg}{target})$.
+
+The next four
+features are similarities of $\psgSrc$ and $\psgTarget$ with the
+context of $\psgSrc$ in $\curDoc$: its preceding and following passages in
+$\curDoc$ denoted $\psgPrev$ and $\psgNext$, respectively. Specifically, {\simSrcPrevWtV}, {\simSrcNextWtV},
+{\simTargetPrevWtV} and {\simTargetNextWtV} are:
+$\cos(\wVecParm{\psg}{src},\wVecParm{\psg}{prec})$,
+$\cos(\wVecParm{\psg}{src},\wVecParm{\psg}{follow})$,
+$\cos(\wVecParm{\psg}{target},\wVecParm{\psg}{prec})$
+and $\cos(\wVecParm{\psg}{target},\wVecParm{\psg}{follow})$. If
+  $\psgSrc$ is the first passage in $\curDoc$ then we use $\psgNext$
+  instead of $\psgPrev$ and if $\psgSrc$ is the last passage in
+  $\curDoc$ we use $\psgPrev$ instead of $\psgNext$; i.e., in both
+  cases, the same feature is used twice.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

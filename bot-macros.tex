@@ -1,0 +1,108 @@
+%%% editing macros
+%\newcommand{\comment}[1]{{\bf {\small !!--#1--!!}}}
+\newcommand{\omt}[1]{}
+\newcommand{\firstmention}[1]{{\bf #1}}
+
+\newcommand{\random}{Random\xspace}
+
+%%% editing
+\newcommand{\myparagraph}[1]{\vspace*{-0ex}\paragraph*{\normalsize\it{#1}}}
+
+%%% basic quantities
+\newcommand{\query}{q}
+\newcommand{\doc}{d}
+\newcommand{\corpus}{\mathcal{D}}
+\newcommand{\initTag}{{\rm init}}
+\newcommand{\topRetGroup}{{\mathcal{D}}_{\initTag}}
+\newcommand{\topRetGroupParam}[1]{{\mathcal{D}}^{[#1]}_{\initTag}}
+\newcommand{\numDoc}{n}
+\newcommand{\arbTerm}{w}
+\newcommand{\stopList}{L_s}
+\newcommand{\numRelDocs}{l}
+
+%% SEO features
+\newcommand{\curDoc}{\doc_{cur}}
+\newcommand{\newDoc}{\doc_{next}}
+\newcommand{\tfVec}[1]{\vec{#1}^{T}}
+\newcommand{\tfVecParm}[2]{\vec{#1}^{T}_{#2}}
+\newcommand{\planted}{planted\xspace}
+
+
+\newcommand{\wVec}[1]{\vec{#1}^{W}}
+\newcommand{\wVecParm}[2]{\vec{#1}^{W}_{#2}}
+
+\newcommand{\psg}{g}
+\newcommand{\genRank}{\pi}
+\newcommand{\psgNext}{\psg_{follow}}
+\newcommand{\psgPrev}{\psg_{prec}}
+\newcommand{\curRank}{\genRank_{cur}}
+\newcommand{\nextRank}{\genRank_{next}}
+\newcommand{\psgSrc}{\psg_{src}}
+\newcommand{\psgTarget}{\psg_{target}}
+\newcommand{\qryTermSrc}{QryTermSrc\xspace}
+\newcommand{\qryTermTarget}{QryTermTarget\xspace}
+\newcommand{\stf}{T}
+\newcommand{\sWV}{W}
+\newcommand{\simSrcTopTF}{SimSrcTop(\stf)\xspace}
+\newcommand{\simSrcTopWtV}{SimSrcTop(\sWV)\xspace}
+\newcommand{\simTargetTopTF}{SimTargetTop(\stf)\xspace}
+\newcommand{\simTargetTopWtV}{SimTargetTop(\sWV)\xspace}
+\newcommand{\simSrcPrevTopTF}{SimSrcPrevTop(\stf)\xspace}
+\newcommand{\simSrcPrevTopWtV}{SimSrcPrevTop(\sWV)\xspace}
+\newcommand{\simTargetPrevTopTF}{SimTargetPrevTop(\stf)\xspace}
+
+\newcommand{\simTargetPrevTopWtV}{SimTargetPrevTop(\sWV)\xspace}
+\newcommand{\simSrcTargetWtV}{SimSrcTarget(\sWV)\xspace}
+\newcommand{\simSrcPrevWtV}{SimSrcPrecPsg(\sWV)\xspace}
+\newcommand{\simSrcNextWtV}{SimSrcFollowPsg(\sWV)\xspace}
+\newcommand{\simTargetPrevWtV}{SimTargetPrecPsg(\sWV)\xspace}
+\newcommand{\simTargetNextWtV}{SimTargetFollowPsg(\sWV)\xspace}
+\newcommand{\rankPromoteLabel}{r}
+\newcommand{\coherenceLabel}{c}
+\newcommand{\rdc}{SRPC\xspace}
+\newcommand{\arith}{Arith\xspace}
+\newcommand{\harm}{Harmonic\xspace}
+
+
+
+%% passages
+\newcommand{\psgInDoc}[2]{g^{#1}_{#2}}
+\newcommand{\psgSet}[1]{G(#1)}
+\newcommand{\psgPool}{G_{pool}}
+
+%%% feature functions
+\newcommand{\ent}{ENT\xspace}
+\newcommand{\swOne}{SW1\xspace}
+\newcommand{\swTwo}{SW2\xspace}
+\newcommand{\coh}{Coherence\xspace}
+
+%%% general math
+\newcommand{\set}[1]{\{#1\}}
+\newcommand{\definedas}{\stackrel{def}{=}}
+\newcommand{\rankEquiv}{\stackrel{rank}{=}}
+\newcommand{\kron}[1]{\delta\hspace{-0.2111em}\left[#1\right]}
+\newcommand{\kld}[2]{D\left(#1 \; \Big\vert\Big\vert \,\, #2\right)}
+\newcommand{\kldSmall}[2]{D\left(#1 \; \vert\vert \,\, #2\right)}
+%\newtheorem{definition}{Definition}
+\newcommand{\freq}[2]{{\rm tf}(#1 \in #2)}
+\newcommand{\wordIndex}{j} 
+\newcommand{\entropy}{H}
+\newcommand{\crossEnt}{CE}
+\newcommand{\assertion}{\psi} %avoid conflict with \numgenerators
+\newcommand{\ce}[2]{\crossEnt\left(#1 \; \Big\vert\Big\vert \,\, #2\right)}
+
+
+
+
+
+%%% metrics
+\newcommand{\map}{MAP\xspace}
+\newcommand{\precFive}{p@5\xspace}
+\newcommand{\ndcg}{NDCG\xspace}
+\newcommand{\ablation}{Exclude $\fFunc_i$\xspace}
+\newcommand{\single}{Only $\fFunc_i$\xspace}
+\newcommand{\rimap}{RI(MAP)\xspace}
+\newcommand{\rindcg}{RI(NDCG)\xspace}
+
+
+
